@@ -62,7 +62,7 @@
     "WebServerToolWindowFactoryState": "false",
     "com.jetbrains.php.phpunit.codeGeneration.PhpNewTestDialog.defaultLibrary": "Codeception Unit",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/vasily/PhpstormProjects/cloud-storage/backend",
+    "last_opened_file_path": "C:/Users/vasily/PhpstormProjects/cloud-storage",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -147,7 +147,7 @@
       <workItem from="1697371214845" duration="2709000" />
       <workItem from="1698243977664" duration="45000" />
       <workItem from="1699862753897" duration="3637000" />
-      <workItem from="1699867132013" duration="325000" />
+      <workItem from="1699867132013" duration="639000" />
     </task>
     <task id="LOCAL-00001" summary="adding files to the project">
       <option name="closed" value="true" />
@@ -165,7 +165,23 @@
       <option name="project" value="LOCAL" />
       <updated>1699866964388</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="adding files to the project">
+      <option name="closed" value="true" />
+      <created>1699867706904</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1699867706904</updated>
+    </task>
+    <task id="LOCAL-00004" summary="adding files to the project">
+      <option name="closed" value="true" />
+      <created>1699867765945</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1699867765945</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
