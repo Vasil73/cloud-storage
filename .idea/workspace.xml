@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8b23c226-6e73-4fae-a1a5-93b5b05b2cb3" name="Changes" comment="adding files to the project" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerConfigs">
+    <option name="configs">
+      <option value="$PROJECT_DIR$/backend/composer.json" />
+    </option>
+  </component>
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution>
+      <executable path="composer" />
+    </execution>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="Make.Settings">
+    <option name="sortAlphabeticallyInToolWindow" value="true" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="PhpDebugGeneral" listening_started="true" />
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 8.1">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/phpmailer/phpmailer" />
+      <path value="$PROJECT_DIR$/backend/vendor/composer" />
+    </include_path>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectId" id="2VL5M65InVvhJ0ym7u17biN57r4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "com.jetbrains.php.phpunit.codeGeneration.PhpNewTestDialog.defaultLibrary": "Codeception Unit",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/vasily/PhpstormProjects/cloud-storage/backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.haulmont.rcb.reactComponents" value="false" />
+        <entry key="com.haulmont.rcb.reactInspector" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\backend" />
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\backend\src\Controllers" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\backend\vendor" />
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\backend" />
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\backend\src" />
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\backend\views" />
+      <recent name="C:\Users\vasily\PhpstormProjects\cloud-storage\front\node_modules" />
+    </key>
+  </component>
+  <component name="RunManager" selected="PHPUnit.backend">
+    <configuration name="backend" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner directory="$PROJECT_DIR$/backend" />
+      <method v="2" />
+    </configuration>
+    <configuration name="cloud-storage" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner directory="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="PHPUnit.backend" />
+        <item itemvalue="PHPUnit.cloud-storage" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8b23c226-6e73-4fae-a1a5-93b5b05b2cb3" name="Changes" comment="" />
+      <created>1694602479072</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1694602479072</updated>
+      <workItem from="1694602484537" duration="103000" />
+      <workItem from="1694605742512" duration="4332000" />
+      <workItem from="1695300430412" duration="58000" />
+      <workItem from="1695570160989" duration="138000" />
+      <workItem from="1695570373565" duration="7000" />
+      <workItem from="1695570669535" duration="8000" />
+      <workItem from="1695994225123" duration="5894000" />
+      <workItem from="1696011434958" duration="2279000" />
+      <workItem from="1696026703356" duration="7342000" />
+      <workItem from="1696584335214" duration="4277000" />
+      <workItem from="1696588729408" duration="1765000" />
+      <workItem from="1697007922248" duration="8096000" />
+      <workItem from="1697016721580" duration="4228000" />
+      <workItem from="1697022853028" duration="14274000" />
+      <workItem from="1697046951274" duration="6337000" />
+      <workItem from="1697097926547" duration="44556000" />
+      <workItem from="1697199895038" duration="12892000" />
+      <workItem from="1697268331779" duration="1180000" />
+      <workItem from="1697275519852" duration="30149000" />
+      <workItem from="1697311378885" duration="4843000" />
+      <workItem from="1697353897986" duration="7701000" />
+      <workItem from="1697365258917" duration="5268000" />
+      <workItem from="1697371214845" duration="2709000" />
+      <workItem from="1698243977664" duration="45000" />
+      <workItem from="1699862753897" duration="3637000" />
+      <workItem from="1699867132013" duration="325000" />
+    </task>
+    <task id="LOCAL-00001" summary="adding files to the project">
+      <option name="closed" value="true" />
+      <created>1699866333744</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1699866333744</updated>
+    </task>
+    <task id="LOCAL-00002" summary="adding files to the project">
+      <option name="closed" value="true" />
+      <created>1699866964388</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1699866964388</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="adding files to the project" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding files to the project" />
+  </component>
+</project>
