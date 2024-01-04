@@ -4,17 +4,18 @@ namespace Core;
 
     class Response
     {
-        public static function sendJson(array $data, int $statusCode = 200)
+        public static function sendResponse($content, $code = 200)
         {
-            http_response_code($statusCode);
-            header('Content-Type: application/json');
-            echo json_encode($data);
+            http_response_code($code);
+            echo $content;
             exit;
         }
 
-        public static function sendError(string $message, int $statusCode = 500)
+        public static function sendJsonResponse($content, $code = 200)
         {
-            self::sendJson(['error' => $message], $statusCode);
+            header('Content-Type: application/json');
+            http_response_code($code);
+            echo json_encode($content);
+            exit;
         }
     }
-

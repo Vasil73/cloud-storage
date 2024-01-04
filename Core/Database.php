@@ -1,7 +1,8 @@
 <?php
 
-namespace components;
+namespace Core;
 
+    use Exception;
     use PDO;
     use PDOException;
 
@@ -11,13 +12,14 @@ namespace components;
 
         private function __construct()
         {
-            //Сделайте конструктор закрытым, чтобы обеспечить соблюдение шаблона Singleton.
+            // Конструктор закрытый, чтобы обеспечить соблюдение шаблона Singleton.
         }
 
         public static function getInstance(): PDO
         {
             if (self::$pdoInstance === null) {
                 try {
+
                     $dsn = 'mysql:host=localhost:3306;dbname=cloud_storage;charset=utf8';
                     $username = 'root';
                     $password = '';
@@ -36,5 +38,6 @@ namespace components;
 
             return self::$pdoInstance;
         }
+
     }
 

@@ -2,43 +2,84 @@
 
 namespace Models;
 
-    use components\Database;
+    use Core\Database;
     use Exception;
     use InvalidArgumentException;
+    use JsonException;
     use PDO;
     use PDOException;
 
-    // use http\Exception;
-
     class UserModel
     {
-        private PDO $pdo;
-        const JSON_CONTENT_TYPE = 'application/json';
+        protected PDO $pdo;
 
         public function __construct()
         {
             $this->pdo = Database::getInstance ();
         }
 
-        public function getUsers(): string
+        public function addUser($userData): bool
         {
-            $json_result = "{}";
-            try {
-                $stmt = $this->pdo->prepare ( "SELECT * FROM users" );
-                $stmt->execute ();
-                $result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
-                $json_result = json_encode ( $result, JSON_THROW_ON_ERROR );
-            } catch (\PDOException $e) {
-                error_log ( 'PDOException - ' . $e->getMessage (), 0 );
-                throw new \PDOException( $e->getMessage (), (int)$e->getCode () );
-            } catch (\JsonException $e) {
-                error_log ( 'JsonException - ' . $e->getMessage (), 0 );
+            $name = htmlspecialchars($userData['name']);
+            $email = filter_var($userData['email'], FILTER_VALIDATE_EMAIL);
+            $age = filter_var($userData['age'], FILTER_VALIDATE_INT);
+            $gender = in_array($userData['gender'], ['male', 'female']) ? $userData['gender'] : null;
+
+            if (!$email || !$age || !$gender) {
+
+                return false;
             }
 
-            header ( 'Content-Type: ' . self::JSON_CONTENT_TYPE );
-            return $json_result;
+            $query = $this->pdo->prepare('INSERT INTO users (name, email, age, gender)
+            VALUES (:name, :email, :age, :gender)');
+            $query->bindValue(':name', $name, PDO::PARAM_STR);
+            $query->bindValue(':email', $email, PDO::PARAM_STR);
+            $query->bindValue(':age', $age, PDO::PARAM_INT);
+            $query->bindValue(':gender', $gender, PDO::PARAM_STR);
+
+            return $query->execute();
         }
 
+        public function updateUser($id, $data): bool
+        {
+            try {
+
+                $name = htmlspecialchars($data['name']);
+                $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
+                $age = filter_var($data['age'], FILTER_VALIDATE_INT);
+                $gender = in_array($data['gender'], ['male', 'female']) ? $data['gender'] : null;
+
+                if(!$email) {
+                    throw new Exception('Неправильный формат email');
+                }
+
+                $query = $this->pdo->prepare("UPDATE users SET name = :name, email = :email, age = :age, 
+                     gender = :gender WHERE id = :id");
+                $query->bindParam(":id", $id, PDO::PARAM_INT);
+                $query->bindParam(":name", $name, PDO::PARAM_STR);
+                $query->bindParam(":email", $email, PDO::PARAM_STR);
+                $query->bindParam(":age", $age, PDO::PARAM_INT);
+                $query->bindParam(":gender", $gender, PDO::PARAM_STR);
+                $query->execute();
+
+                return true;
+            } catch (Exception $e) {
+                echo "Ошибка обновления данных пользователя: " . $e->getMessage();
+                return false;
+            }
+        }
+
+        public function getUsers(): array
+        {
+            $stmt = $this->pdo->prepare ( "SELECT * FROM users" );
+            $stmt->execute ();
+
+            return $stmt->fetchAll ( PDO::FETCH_ASSOC );
+        }
+
+        /**
+         * @throws JsonException
+         */
         public function getUserById($userId)
         {
             $userId = intval ($userId);
@@ -53,77 +94,46 @@ namespace Models;
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // Проверка на то, что результат не является FALSE
             if (!$result) {
-                return json_encode(["status" => "error", "message" => "No results found for user ID: $userId"]);
+                return json_encode(["status" => "error", "message" => "User not found."]);
             }
-
-            header('Content-Type: application/json');
-            return json_encode($result);
+            else {
+                return json_encode($result, JSON_THROW_ON_ERROR);
+            }
         }
 
-        /**
-         * @throws Exception
-         */
         public function searchByEmail($email)
         {
-            $email = filter_var ( $email, FILTER_VALIDATE_EMAIL );
-            if ($email === false) {
-                throw new InvalidArgumentException( 'Invalid email address' );
+            $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+            if($email === false) {
+                throw new InvalidArgumentException('Неверный адрес электронной почты');
             }
 
             try {
                 $stmt = $this->pdo->prepare ( "SELECT * FROM users WHERE email= :email" );
-                $stmt->bindValue ( ':email', $email );
+                $stmt->bindValue  ( ':email', $email );
                 $stmt->execute ();
 
                 return $stmt->fetch ( PDO::FETCH_ASSOC );
 
             } catch (PDOException $e) {
-                error_log ( 'Database error: ' . $e->getMessage () );
+                error_log('ошибка базы данных: ' . $e->getMessage ());
                 throw $e;
             }
         }
 
-        public function updateUser($id, $data)
+        public function deleteUserById($id): bool
         {
-            try {
-                $name = htmlspecialchars ( $data[ 'name' ] );
-                $email = filter_var ( $data[ 'email' ], FILTER_VALIDATE_EMAIL );
-                $age = filter_var ( $data[ 'age' ], FILTER_VALIDATE_INT );
-                $gender = in_array ( $data[ 'gender' ], ['male', 'female'] ) ? $data[ 'gender' ] : null;
-
-                if (!$email) {
-                    throw new Exception( 'Invalid email format' );
-                }
-
-                if (!$age) {
-                    throw new Exception( 'Invalid age format' );
-                }
-
-                if (!$gender) {
-                    throw new Exception( 'Invalid gender format' );
-                }
-
-                $query = $this->pdo->prepare ( "UPDATE users SET name = :name, email = :email, age = :age, 
-                 gender = :gender WHERE id = :id" );
-                $query->bindValue ( ":id", $id, PDO::PARAM_INT );
-                $query->bindValue ( ":name", $name, PDO::PARAM_STR );
-                $query->bindValue ( ":email", $email, PDO::PARAM_STR );
-                $query->bindValue ( ":age", $age, PDO::PARAM_INT );
-                $query->bindValue ( ":gender", $gender, PDO::PARAM_STR );
-                $query->execute ();
-
-                return true;
-            } catch (Exception $e) {
-                return "Error updating user data: " . $e->getMessage ();
+            $id = intval ($id);
+            if ($id <= 0) {
+                return false;
             }
+
+            $query = $this->pdo->prepare('DELETE FROM users WHERE id = :id');
+            $query->bindValue(':id', $id, PDO::PARAM_INT);
+
+            return $query->execute();
         }
 
-        public function deleteUser($id)
-        {
-            $query = "DELETE FROM users WHERE id = :Id";
-            $stmt = $this->pdo->prepare ( $query );
-            $stmt->bindParam ( ':Id', $id, PDO::PARAM_INT );
-            $stmt->execute ( [':Id' => $id] );
-        }
     }

@@ -1,130 +1,135 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Controllers;
 
+    use Core\JsonRequest;
+    use Core\Response;
+    use Core\SessionManager;
     use Exception;
-    use InvalidArgumentException;
-    use PDO;
+    use JsonException;
+    use Models\AuthModel;
     use PDOException;
 
     class AuthController
     {
+        private AuthModel $authModel;
+        private SessionManager $sessionManager;
 
-        // Регистрация ползователя
-        public function register($email, $name, $password, $role, int $age = null, $gender = null): bool
+        public function __construct()
         {
-            $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidArgumentException("Неверный формат email");
-            }
-            if (strlen($password) < 6) {
-                throw new InvalidArgumentException("Пароль должен быть не менее 6 символов");
-            }
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            $stmt = $this->pdo->prepare("INSERT INTO users (email, name, password, role, age, gender)
-                                        VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$email, $name, $hashedPassword, $role, $age, $gender]);
-
-            return $stmt->rowCount() > 0;
+            $this->authModel = new AuthModel();
+            $this->sessionManager = new SessionManager();
+            $this->sessionManager->start();
         }
 
-        // Вход в систему пользователем
-        /**
-         * @throws Exception
-         */
-        public function login(array $data): array
+        public function register(): void
         {
-            if(!isset($data['email']) || !isset($data['password'])) {
-                throw new InvalidArgumentException("Email или пароль отсутствуют");
+            $input = file_get_contents("php://input");
+            $data = json_decode($input, true);
+
+            if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+                Response::sendJsonResponse(["error" => 'Неправильный JSON'], 400);
+                exit(); // Завершаем выполнение скрипта
             }
 
-            $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidArgumentException("Неверный формат email");
+            if (isset($data['name'], $data['email'], $data['password'], $data['role'])) {
+                $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+                $registerResult = $this->authModel->register($data['name'], $data['email'], $hashedPassword, $data['role']);
+                if (!$registerResult) {
+                    Response::sendJsonResponse(["error" => 'Ошибка при регистрации'], 400);
+                    exit(); // Завершаем выполнение скрипта
+                }
+            } else {
+                Response::sendJsonResponse(["error" => 'Данные не полные'], 400);
+                exit(); // Завершаем выполнение скрипта
             }
-
-            $password = $data['password'];
-
-            $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
-            $stmt->bindParam(':email', $email);
-            $stmt->execute();
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($result && password_verify($password, $result["password"])) {
-                $token = bin2hex(random_bytes(16));
-
-                $stmt = $this->pdo->prepare("UPDATE users SET token = :token WHERE id = :id");
-                $stmt->bindParam(':token', $token);
-                $stmt->bindParam(':id', $result["id"]);
-                $stmt->execute();
-
-                unset($result["password"]);
-
-                $_SESSION['token'] = $token;
-
-                return empty($result) ? ['error' => "Неверный логин или пароль"] : $result;
-
-            }
-
-            return ['error' => "Неверный логин или пароль"];
-
         }
 
-        // Сброс пароля пользователя
-        public function logout($id)
-        {
-            $stmt = $this->pdo->prepare('UPDATE users SET token = NULL WHERE id = :id');
-            //  $stmt->execute([':token' => $userToken]);
-            $stmt->execute([':id' => $id]);
-
-            if (isset($_COOKIE['token'])) {
-                setcookie('token', '', time() - 3600, '/', '', false, true);
-            }
-
-            return json_encode(['message' => 'Вышел из системы успешно']);
-        }
-
-
-        public function resetPassword(string $email): bool
+        public function login($email, $password)
         {
             try {
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    throw new InvalidArgumentException('Неверный формат электронной почты');
+                $user = $this->authModel->authenticate($email);
+                if (!$user) {
+                    return false;
                 }
 
-                // Check if user exists first
-                $query = "SELECT * FROM users WHERE email = :email";
-                $stmt = $this->pdo->prepare($query);
-                $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-                $stmt->execute();
-                if ($stmt->rowCount() === 0) {
-                    throw new Exception('Ни один пользователь не найден с таким адресом электронной почты');
+                $hashedPassword = $user['password'];
+                if (password_verify($password, $hashedPassword)) {
+                    $token = $this->generateToken();
+                    $this->authModel->setToken($user['id'], $token);
+                    $this->sessionManager->set('user_id', $user['id']);
+                    $this->sessionManager->set('token', $token);
+                    return true;
+                } else {
+                    return false;
                 }
-
-                $resetToken = bin2hex(random_bytes(32));
-
-                $query = "UPDATE users SET reset_token = :resetToken, reset_token_expires = NOW() + INTERVAL 1 
-                         HOUR WHERE email = :email";
-                $stmt = $this->pdo->prepare($query);
-                $stmt->bindParam(':resetToken', $resetToken, PDO::PARAM_STR);
-                $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-                if ($stmt->execute()) {
-                    $resetLink = "https://example.com/reset_password.php?token=$resetToken";
-                    $to = $email;
-                    $subject = "Сброс пароля";
-                    $message = "Чтобы сбросить пароль, нажмите следующую ссылку: $resetLink";
-                    $headers = "От: vasil@example.com";
-                    if (mail($to, $subject, $message, $headers)) {
-                        return true;
-                    }
-                }
-            } catch (PDOException $e) {
-                error_log('Ошибка сброса пароля: ' . $e->getMessage());
-            } catch (Exception $exception) {
-                error_log('Ошибка сброса пароля: ' . $exception->getMessage());
+            } catch (PDOException $ex)
+            {
+                error_log($ex->getMessage()); // Логирование ошибки
+                Response::sendJsonResponse(["error" => "Внутренняя ошибка сервера"], 500);
+                exit();
             }
-            return false;
         }
+
+         public function logout($id): void
+         {
+             try {
+                 $this->authModel->logout($id);
+
+                     $this->sessionManager->destroy();
+                     Response::sendJsonResponse(["message" => "Вы успешно вышли из системы"], 200);
+                     return;
+             } catch (PDOException $ex) {
+                 Response::sendJsonResponse(["error" => "Ошибка при выходе из системы"], 400);
+             } catch (Exception $e) {
+                 Response::sendJsonResponse ( ["error" => "Внутренняя ошибка сервера"], 500 );
+             }
+         }
+
+        public function resetPassword(): void
+        {
+            $requestBody = new JsonRequest();
+            $requestData = $requestBody->getData ();
+
+            $email = $requestData['email'];
+
+            $resetStatus = $this->authModel->resetPassword($email);
+            if ($resetStatus) {
+                Response::sendJsonResponse([
+                    'status' => 'success',
+                    'message' => 'Проверьте вашу электронную почту для дальнейших инструкций по сбросу пароля'
+                ], 200);
+            } else {
+                Response::sendJsonResponse([
+                    'status' => 'error',
+                    'message' => 'Возникла ошибка при попытке сбросить ваш пароль'
+                ], 400);
+            }
+        }
+
+        private function generateToken(): string
+        {
+            return bin2hex(openssl_random_pseudo_bytes(16));
+        }
+
+        public function handleLoginRequest(): void
+        {
+            $jsonData = new JsonRequest();
+            $data = $jsonData->getData ();
+
+            if (isset($data['email']) && isset($data['password'])) {
+                $result = $this->login($data['email'], $data['password']);
+                if ($result) {
+                    Response::sendJsonResponse(["message" => "Успешный вход в систему"], 200);
+                    exit();
+                } else {
+                    Response::sendJsonResponse(["error" => "Неверные учетные данные"], 401);
+                }
+            } else {
+                Response::sendJsonResponse(["error" => "Отсутствуют необходимые данные"], 400);
+            }
+        }
+
     }
