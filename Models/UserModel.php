@@ -3,6 +3,7 @@
 namespace Models;
 
     use Core\Database;
+    use Core\Response;
     use Exception;
     use InvalidArgumentException;
     use JsonException;
@@ -42,16 +43,10 @@ namespace Models;
 
         public function updateUser($id, $data): bool
         {
-            try {
-
                 $name = htmlspecialchars($data['name']);
                 $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
                 $age = filter_var($data['age'], FILTER_VALIDATE_INT);
                 $gender = in_array($data['gender'], ['male', 'female']) ? $data['gender'] : null;
-
-                if(!$email) {
-                    throw new Exception('Неправильный формат email');
-                }
 
                 $query = $this->pdo->prepare("UPDATE users SET name = :name, email = :email, age = :age, 
                      gender = :gender WHERE id = :id");
@@ -63,10 +58,6 @@ namespace Models;
                 $query->execute();
 
                 return true;
-            } catch (Exception $e) {
-                echo "Ошибка обновления данных пользователя: " . $e->getMessage();
-                return false;
-            }
         }
 
         public function getUsers(): array

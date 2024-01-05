@@ -3,8 +3,8 @@
 namespace Models;
 
     use Core\Database;
+    use Core\TableValidator;
     use Exception;
-    use Handler\TableValidator;
     use PDO;
     use PDOException;
 

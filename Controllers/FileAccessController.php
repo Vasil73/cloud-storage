@@ -2,8 +2,8 @@
 
 namespace Controllers;
 
+    use Core\TableValidator;
     use Exception;
-    use Handler\TableValidator;
     use Models\FileAccessModel;
 
     class FileAccessController

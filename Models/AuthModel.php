@@ -30,7 +30,7 @@ namespace Models;
                 throw new \InvalidArgumentException("Пароль должен быть не менее 6 символов");
             }
             if ($this->userExists($email)) {
-                Response::sendJsonResponse ( ["error" => 'A user with this email already exists'] );
+                Response::sendJsonResponse ( ["error" => 'Пользователь с таким email уже есть'] );
                 return false;
             }
 
@@ -60,7 +60,7 @@ namespace Models;
         public function logout($id): void
         {
             $stmt = $this->pdo->prepare ( 'UPDATE users SET token = NULL WHERE id = :id' );
-            $stmt->execute ( [':id' => $id] );
+            $stmt->execute ( [':id' => $id['id']] ); //
         }
 
         public function resetPassword(string $email): bool
@@ -96,10 +96,11 @@ namespace Models;
                     }
                 }
             } catch (PDOException $e) {
-                error_log ( 'Ошибка сброса пароля: ' . $e->getMessage () );
+                error_log ( 'Ошибка сброса пароля: PDOException:' . $e->getMessage () );
             } catch (Exception $exception) {
-                error_log ( 'Ошибка сброса пароля: ' . $exception->getMessage () );
+                error_log ( 'Ошибка сброса пароля: Exception' . $exception->getMessage () );
             }
+
             return false;
         }
 

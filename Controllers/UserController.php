@@ -38,30 +38,30 @@ namespace Controllers;
             }
         }
 
-        public function updateUser( $params ): void
+        public function updateUser($params ): void
         {
-            if(!isset( $params['id'])) {
-                Response::sendJsonResponse (['error' => 'Параметр id обязателен'], 400);
+            if (!isset( $params[ 'id' ] )) {
+                Response::sendJsonResponse ( ['error' => 'Параметр id обязателен'], 400 );
                 return;
             }
 
-            $input = json_decode(file_get_contents('php://input'), true);
+            $input = json_decode ( file_get_contents ( 'php://input' ), true );
 
-            if(!isset($input['name'], $input['email'], $input['age'], $input['gender'])) {
-                Response::sendJsonResponse (['error' => 'Необходимы параметры: name, email, age, gender'], 400);
+            if (!isset( $input[ 'name' ], $input[ 'email' ], $input[ 'age' ], $input[ 'gender' ] )) {
+                Response::sendJsonResponse ( ['error' => 'Необходимы параметры: name, email, age, gender'], 400 );
                 return;
             }
 
             try {
-                $isUpdated = $this->userModel->updateUser($params['id'], $input);
+                $isUpdated = $this->userModel->updateUser ( $params[ 'id' ], $input );
                 if ($isUpdated) {
-                    Response::sendJsonResponse (['status' => "Пользователь успешно обновлен"]);
+                    Response::sendJsonResponse ( ['status' => "Пользователь успешно обновлен"] );
                 } else {
-                    Response::sendJsonResponse (['status' => "Ошибка при обновлении пользователя"], 400);
+                    Response::sendJsonResponse ( ['status' => "Ошибка при обновлении пользователя"], 400 );
                 }
 
-            }  catch (PDOException $ex) {
-                Response::sendJsonResponse(["error" => "Внутренняя ошибка сервера"], 500);
+            } catch (PDOException $ex) {
+                Response::sendJsonResponse ( ["error" => "Внутренняя ошибка сервера"], 500 );
             } catch (\JsonException $e) {
             }
         }

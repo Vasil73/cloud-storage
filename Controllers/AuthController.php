@@ -26,20 +26,22 @@ namespace Controllers;
 
         public function register(): void
         {
-            $input = file_get_contents("php://input");
-            $data = json_decode($input, true);
+            $input = new JsonRequest();
+            $data = $input->getData ();
 
             if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
                 Response::sendJsonResponse(["error" => 'Неправильный JSON'], 400);
-                exit(); // Завершаем выполнение скрипта
+                return; // Завершаем выполнение скрипта
             }
 
             if (isset($data['name'], $data['email'], $data['password'], $data['role'])) {
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
                 $registerResult = $this->authModel->register($data['name'], $data['email'], $hashedPassword, $data['role']);
-                if (!$registerResult) {
-                    Response::sendJsonResponse(["error" => 'Ошибка при регистрации'], 400);
-                    exit(); // Завершаем выполнение скрипта
+                if ($registerResult) {
+                    Response::sendJsonResponse(["message" => 'Вы успешно зарегистрировались'], 400);
+                   exit(); // Завершаем выполнение скрипта
+                } elseif (!$registerResult) {
+                    Response::sendJsonResponse (["error" => "Ошибка регистрации"]);
                 }
             } else {
                 Response::sendJsonResponse(["error" => 'Данные не полные'], 400);
@@ -61,6 +63,9 @@ namespace Controllers;
                     $this->authModel->setToken($user['id'], $token);
                     $this->sessionManager->set('user_id', $user['id']);
                     $this->sessionManager->set('token', $token);
+
+                    setcookie ('session_token', $token, time () + 3600, '/', '', true, true);
+
                     return true;
                 } else {
                     return false;
@@ -88,7 +93,7 @@ namespace Controllers;
              }
          }
 
-        public function resetPassword(): void
+        public function resetPassword()
         {
             $requestBody = new JsonRequest();
             $requestData = $requestBody->getData ();

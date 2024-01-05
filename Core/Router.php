@@ -10,21 +10,21 @@ namespace Core;
             $this->routes = $routes;
         }
 
-        public function route(Request $request): void
+        public function route(Request $request)
         {
             foreach($this->routes as $method => $routes) {
                 if ($method === $request->getMethod()) {
                     foreach($routes as $route => $action) {
                         $matchResult = $this->matchRoute($route, $request->getUri());
                         if ($matchResult['isMatch']) {
-                            $controller = new $action[0]();
-                            $controller->{$action[1]}(...$matchResult['params']);
-                            return;
+                            $controller = new $action[0]();  // $controller->{$action[1]}($matchResult['params']
+                            $controller->{$action[1]}($matchResult['params']);
                         }
                     }
                 }
             }
             Response::sendResponse('Not Found', 404);
+            return false;
         }
 
         private function matchRoute(string $route, string $uri): array

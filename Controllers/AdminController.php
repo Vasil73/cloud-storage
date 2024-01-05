@@ -2,30 +2,54 @@
 
 namespace Controllers;
 
+    use Models\AdminModel;
     use Core\Response;
-    use Models\AdminModels;
+    use Exception;
 
     class AdminController
     {
-        private AdminModels $adminModel;
+        private $adminModel;
 
         public function __construct()
         {
-            $this->adminModel = new AdminModels();
-        }
-        public function getUserList($adminId): array
-        {
-
-            return $this->adminModel->getUserList ($adminId);
+            $this->adminModel = new AdminModel();
         }
 
-        public function updateUser($id, $data): bool
+        public function getUserList($adminId)
         {
-            return $this->adminModel->updateUser ($id, $data);
+            try {
+                $users = $this->adminModel->getUserList($adminId);
+                Response::sendJsonResponse(['users' => $users], 200);
+            } catch (Exception $e) {
+                Response::sendJsonResponse(['error' => $e->getMessage()], $e->getCode());
+            }
         }
 
-        public function deleteUsers($adminId)
+        public function deleteUser($adminId, $userId)
         {
-            return $this->adminModel->deleteUsers ($adminId);
+            try {
+                $result = $this->adminModel->deleteUser($adminId, $userId);
+                if ($result) {
+                    Response::sendJsonResponse(['message' => 'User deleted successfully.'], 200);
+                } else {
+                    Response::sendJsonResponse(['error' => 'Failed to delete user.'], 400);
+                }
+            } catch (Exception $e) {
+                Response::sendJsonResponse(['error' => $e->getMessage()], $e->getCode());
+            }
+        }
+
+        public function updateUser($adminId, $userId, $data)
+        {
+            try {
+                $result = $this->adminModel->updateUser($userId, $data);
+                if ($result) {
+                    Response::sendJsonResponse(['message' => 'User updated successfully.'], 200);
+                } else {
+                    Response::sendJsonResponse(['error' => 'Failed to update user.'], 400);
+                }
+            } catch (Exception $e) {
+                Response::sendJsonResponse(['error' => $e->getMessage()], $e->getCode());
+            }
         }
     }

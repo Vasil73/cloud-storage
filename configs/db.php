@@ -1,7 +1,7 @@
 <?php
 
 $config = [
-    'host' => 'localhost', // здесь должны быть ваши реальные настройки
+    'host' => 'localhost',
     'dbname' => 'my_database',
     'username' => 'user',
     'password' => 'password',

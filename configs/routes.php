@@ -23,6 +23,7 @@ use Controllers\FileAccessController;
             '/get/shared/user/' => [FileAccessController::class, 'getSharedUsers']
         ],
         'POST' => [
+
             '/user/create/' => [UserController::class, 'createUser'],
             '/users/login/' => [AuthController::class, 'handleLoginRequest'],
             '/users/reset_password/' => [AuthController::class, 'resetPassword'],
@@ -38,7 +39,7 @@ use Controllers\FileAccessController;
             '/files/share/{id:\d+}/{user_id:\d+}/' => [FileAccessController::class, 'addSharedUsers']
         ],
         'DELETE' => [
-            '/admin/users/delete/{id:\d+}/' => [AdminController::class, 'deleteUsers'],
+            '/admin/users/delete/{id:\d+}/' => [AdminController::class, 'deleteUser'],
             '/user/delete/{id}/' => [UserController::class, 'deleteUser'],
             '/files/remove/{id:\d+}/' => [FilesController::class, 'removeFile'],
             '/directories/delete/{id:\d+}/' => [FoldersFileController::class, 'removeFolder'],

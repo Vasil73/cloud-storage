@@ -1,6 +1,6 @@
 <?php
 
-namespace Handler;
+namespace Core;
 
     use Exception;
 
