@@ -22,7 +22,6 @@ namespace Models;
             $this->table_name = $table_name;
           //  $this->pdo = App::getService ('database_connect');
               $this->pdo = Database::getInstance ();
-
         }
 
         /**

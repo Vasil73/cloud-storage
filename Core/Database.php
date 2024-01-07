@@ -32,7 +32,7 @@ namespace Core;
 
                     self::$pdoInstance = new PDO($dsn, $username, $password, $options);
                 } catch (PDOException $e) {
-                    die('Database connection failed: ' . $e->getMessage());
+                    die('Не удалось подключиться к базе данных: ' . $e->getMessage());
                 }
             }
 

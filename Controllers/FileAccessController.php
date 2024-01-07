@@ -10,20 +10,16 @@ namespace Controllers;
 
     class FileAccessController
     {
-        private string $table_name;
         private FileAccessModel $model;
 
-        public function __construct($table_name)
+        public function __construct()
         {
-            $this->table_name = $table_name;
-            $this->model = new FileAccessModel($table_name);
+            $this->model = new FileAccessModel('file_user');
         }
 
         public function addSharedUsers($file_id, $user_id)
         {
             try {
-
-
                 if ($this->model->addSharedUser($file_id, $user_id)) {
                     Response::sendJsonResponse(["message" => "Пользователь успешно добавлен в общий доступ"], 200);
                 } else {
@@ -38,9 +34,6 @@ namespace Controllers;
         public function getSharedUsers($fileId)
         {
             try {
-                $validator = new TableValidator($this->table_name);
-                $validator->check();
-
                 $users = $this->model->getSharedUsers($fileId);
                 if (!empty($users)) {
                     Response::sendJsonResponse($users, 200);
@@ -57,9 +50,6 @@ namespace Controllers;
         public function removeSharedUser($file_id, $user_id)
         {
             try {
-                $validator = new TableValidator($this->table_name);
-                $validator->check();
-
                 if ($this->model->removeSharedUser($file_id, $user_id)) {
                     Response::sendJsonResponse(["message" => "Пользователь успешно удален из общего доступа."], 200);
                 } else {

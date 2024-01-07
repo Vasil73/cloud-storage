@@ -23,7 +23,7 @@ namespace Core;
         {
 
             if (!in_array($this->table_name, $this->allowedTables)) {
-                throw new Exception("Invalid table name: {$this->table_name}");
+                throw new Exception("Неверное имя таблицы: {$this->table_name}");
             }
         }
 

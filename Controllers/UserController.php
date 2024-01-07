@@ -12,9 +12,9 @@ namespace Controllers;
     class UserController {
         private UserModel $userModel;
 
-        public function __construct(string $table_name)
+        public function __construct()
         {
-            $this->userModel = new UserModel($table_name);
+            $this->userModel = new UserModel('user');
         }
 
         public function updateUser($params ): void

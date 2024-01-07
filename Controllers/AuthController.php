@@ -7,6 +7,7 @@ namespace Controllers;
     use Core\JsonRequest;
     use Core\Response;
     use Core\SessionManager;
+    use Core\TableValidator;
     use Exception;
     use Models\AuthModel;
     use PDOException;
@@ -16,9 +17,9 @@ namespace Controllers;
         private AuthModel $authModel;
         private SessionManager $sessionManager;
 
-        public function __construct(string $table_name)
+        public function __construct()
         {
-            $this->authModel = new AuthModel($table_name);
+            $this->authModel = new AuthModel('user');
             $this->sessionManager = new SessionManager();
             $this->sessionManager->start();
         }
@@ -41,7 +42,7 @@ namespace Controllers;
                 $registerResult = $this->authModel->register($data['name'], $data['email'], $hashedPassword, $data['role']);
                 if (isset($registerResult)) {
                     Response::sendJsonResponse(["message" => 'Вы успешно зарегистрировались'], 200);
-                   exit(); // Завершаем выполнение скрипта
+                   exit();
                 } elseif (!$registerResult) {
                     Response::sendJsonResponse (["error" => "Ошибка регистрации"]);
                 }

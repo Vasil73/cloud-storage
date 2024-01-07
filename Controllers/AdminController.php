@@ -11,9 +11,9 @@ namespace Controllers;
     {
         private AdminModel $adminModel;
 
-        public function __construct(string $table_name)
+        public function __construct()
         {
-            $this->adminModel = new AdminModel($table_name);
+            $this->adminModel = new AdminModel('user');
         }
 
         public function getUserList($adminId)
