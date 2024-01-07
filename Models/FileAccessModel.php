@@ -3,6 +3,8 @@
 namespace Models;
 
     use Core\Database;
+    use Core\TableValidator;
+    use Exception;
     use PDO;
 
     class FileAccessModel
@@ -16,9 +18,14 @@ namespace Models;
             $this->pdo = Database::getInstance ();
         }
 
+        /**
+         * @throws Exception
+         */
         public function addSharedUser($file_id, $user_id): bool
         {
-            $stmt = $this->pdo->prepare ( "INSERT INTO " . $this->table_name . "
+            $validator = new TableValidator($this->table_name);
+            $validator->check();
+            $stmt = $this->pdo->prepare ( "INSERT INTO  " . $this->table_name . "
                     (file_id, user_id) VALUES (:file_id, :user_id)" );
             $stmt->bindParam ( ':file_id', $file_id, PDO::PARAM_INT );
             $stmt->bindParam ( ':user_id', $user_id, PDO::PARAM_INT );
@@ -37,7 +44,7 @@ namespace Models;
 
         public function removeSharedUser($file_id, $user_id): bool
         {
-            $stmt = $this->pdo->prepare ( "DELETE FROM {$this->table_name}
+            $stmt = $this->pdo->prepare ( "DELETE FROM " . $this->table_name . "
                 WHERE file_id = :file_id AND id = :user_id" );
             $stmt->bindParam ( ':file_id', $file_id );
             $stmt->bindParam ( ':user_id', $user_id );

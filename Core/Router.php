@@ -2,6 +2,8 @@
 
 namespace Core;
 
+    use Exception;
+
     class Router {
         private $routes;
 
@@ -10,6 +12,9 @@ namespace Core;
             $this->routes = $routes;
         }
 
+        /**
+         * @throws Exception
+         */
         public function route(Request $request)
         {
             foreach($this->routes as $method => $routes) {
@@ -17,7 +22,7 @@ namespace Core;
                     foreach($routes as $route => $action) {
                         $matchResult = $this->matchRoute($route, $request->getUri());
                         if ($matchResult['isMatch']) {
-                            $controller = new $action[0]();  // $controller->{$action[1]}($matchResult['params']
+                            $controller = new $action[0]();
                             $controller->{$action[1]}($matchResult['params']);
                         }
                     }

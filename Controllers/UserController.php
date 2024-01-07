@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+    use Core\JsonRequest;
     use Core\Response;
     use InvalidArgumentException;
     use Models\UserModel;
@@ -11,45 +12,23 @@ namespace Controllers;
     class UserController {
         private UserModel $userModel;
 
-        public function __construct()
+        public function __construct(string $table_name)
         {
-            $this->userModel = new UserModel();
-        }
-
-        public function createUser( $userData )
-        {
-            $input = json_decode(file_get_contents('php://input'), true);
-
-            if(!isset($input['name'], $input['email'], $input['age'], $input['gender'], $input['role'])) {
-                Response::sendJsonResponse (['error' => 'Необходимы параметры: name, email, age, gender'], 400);
-                return;
-            }
-
-            try {
-                $isUserData = $this->userModel->addUser($userData, $input);
-                if ($isUserData) {
-                    Response::sendJsonResponse (['status' => "Пользователь успешно добавлен"]);
-                } else {
-                    Response::sendJsonResponse (['status' => "Ошибка при добавлении пользователя"], 400);
-                }
-
-            }  catch (PDOException $ex) {
-                Response::sendJsonResponse(["error" => "Внутренняя ошибка сервера"], 500);
-            }
+            $this->userModel = new UserModel($table_name);
         }
 
         public function updateUser($params ): void
         {
             if (!isset( $params[ 'id' ] )) {
                 Response::sendJsonResponse ( ['error' => 'Параметр id обязателен'], 400 );
-                return;
             }
+            $jsonRequest = new JsonRequest();
+            $input = $jsonRequest->getData ();
 
-            $input = json_decode ( file_get_contents ( 'php://input' ), true );
+           // $input = json_decode(file_get_contents('php://input'), true);
 
             if (!isset( $input[ 'name' ], $input[ 'email' ], $input[ 'age' ], $input[ 'gender' ] )) {
                 Response::sendJsonResponse ( ['error' => 'Необходимы параметры: name, email, age, gender'], 400 );
-                return;
             }
 
             try {
@@ -62,7 +41,8 @@ namespace Controllers;
 
             } catch (PDOException $ex) {
                 Response::sendJsonResponse ( ["error" => "Внутренняя ошибка сервера"], 500 );
-            } catch (\JsonException $e) {
+                return;
+            } catch (Exception $e) {
             }
         }
 
@@ -90,7 +70,6 @@ namespace Controllers;
             }
             catch (PDOException $ex) {
                 Response::sendJsonResponse(["error" => "Внутренняя ошибка сервера"], 500);
-            } catch (\JsonException $e) {
             }
         }
 

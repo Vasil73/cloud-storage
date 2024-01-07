@@ -3,59 +3,45 @@
 namespace Controllers;
 
     use Models\FileModel;
+    use Core\Response;
     use Exception;
 
     class FilesController
     {
         private FileModel $fileModel;
 
-        public function __construct(FileModel $fileModel)
+        public function __construct()
         {
-            $this->fileModel = $fileModel;
+            $this->fileModel = new FileModel('file');
         }
 
-        public function fileList()
+        public function listFiles()
         {
-            try{
-                $result = $this->fileModel->fileList();
-
-                if(isset(json_decode($result, true)['error'])) {
-                    throw new Exception(json_decode($result, true)['error']);
-                }
-
-                return $result;
+            try {
+                $files = $this->fileModel->fileList();
+                Response::sendJsonResponse($files);
             } catch (Exception $e) {
-                return 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(["error" => $e->getMessage()], 500);
             }
         }
 
         public function getFile($id)
         {
             try {
-                $result = $this->fileModel->getFile($id);
-
-                if(isset(json_decode($result, true)['error'])) {
-                    throw new Exception(json_decode($result, true)['error']);
-                }
-
-                return $result;
+                $file = $this->fileModel->getFile($id);
+                Response::sendJsonResponse($file);
             } catch (Exception $e) {
-                return 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(["error" => $e->getMessage()], 404);
             }
         }
 
         public function addFile($data)
         {
             try {
-                $result = $this->fileModel->addFile($data);
-
-                if(isset(json_decode($result, true)['error'])) {
-                    throw new Exception(json_decode($result, true)['error']);
-                }
-
-                return $result;
+                $file = $this->fileModel->addFile($data);
+                Response::sendJsonResponse($file, 201);
             } catch (Exception $e) {
-                return 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(["error" => $e->getMessage()], 400);
             }
         }
 
@@ -63,14 +49,19 @@ namespace Controllers;
         {
             try {
                 $result = $this->fileModel->renameFile($id, $newName);
-
-                if(isset(json_decode($result, true)['error'])) {
-                    throw new Exception(json_decode($result, true)['error']);
-                }
-
-                return $result;
+                Response::sendJsonResponse($result);
             } catch (Exception $e) {
-                return 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(["error" => $e->getMessage()], 400);
+            }
+        }
+
+        public function removeFile($id)
+        {
+            try {
+                $result = $this->fileModel->removeFile($id);
+                Response::sendJsonResponse($result);
+            } catch (Exception $e) {
+                Response::sendJsonResponse(["error" => $e->getMessage()], 400);
             }
         }
     }

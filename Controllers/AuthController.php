@@ -8,7 +8,6 @@ namespace Controllers;
     use Core\Response;
     use Core\SessionManager;
     use Exception;
-    use JsonException;
     use Models\AuthModel;
     use PDOException;
 
@@ -17,13 +16,16 @@ namespace Controllers;
         private AuthModel $authModel;
         private SessionManager $sessionManager;
 
-        public function __construct()
+        public function __construct(string $table_name)
         {
-            $this->authModel = new AuthModel();
+            $this->authModel = new AuthModel($table_name);
             $this->sessionManager = new SessionManager();
             $this->sessionManager->start();
         }
 
+        /**
+         * @throws Exception
+         */
         public function register(): void
         {
             $input = new JsonRequest();
@@ -31,14 +33,14 @@ namespace Controllers;
 
             if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
                 Response::sendJsonResponse(["error" => 'Неправильный JSON'], 400);
-                return; // Завершаем выполнение скрипта
+                return;
             }
 
             if (isset($data['name'], $data['email'], $data['password'], $data['role'])) {
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
                 $registerResult = $this->authModel->register($data['name'], $data['email'], $hashedPassword, $data['role']);
-                if ($registerResult) {
-                    Response::sendJsonResponse(["message" => 'Вы успешно зарегистрировались'], 400);
+                if (isset($registerResult)) {
+                    Response::sendJsonResponse(["message" => 'Вы успешно зарегистрировались'], 200);
                    exit(); // Завершаем выполнение скрипта
                 } elseif (!$registerResult) {
                     Response::sendJsonResponse (["error" => "Ошибка регистрации"]);
@@ -64,7 +66,7 @@ namespace Controllers;
                     $this->sessionManager->set('user_id', $user['id']);
                     $this->sessionManager->set('token', $token);
 
-                    setcookie ('session_token', $token, time () + 3600, '/', '', true, true);
+                    setcookie ('token', $token, time () + 3600, '/', '', true, true);
 
                     return true;
                 } else {
@@ -72,10 +74,12 @@ namespace Controllers;
                 }
             } catch (PDOException $ex)
             {
-                error_log($ex->getMessage()); // Логирование ошибки
+                error_log($ex->getMessage());
                 Response::sendJsonResponse(["error" => "Внутренняя ошибка сервера"], 500);
-                exit();
+            } catch (Exception $e) {
+
             }
+            return ['massage' => 'Вы успешно вошли в систему.'];
         }
 
          public function logout($id): void
@@ -93,12 +97,15 @@ namespace Controllers;
              }
          }
 
+        /**
+         * @throws Exception
+         */
         public function resetPassword()
         {
-            $requestBody = new JsonRequest();
-            $requestData = $requestBody->getData ();
+              $input = new JsonRequest();
+              $data = $input->getData ();
 
-            $email = $requestData['email'];
+            $email = $data['email'];
 
             $resetStatus = $this->authModel->resetPassword($email);
             if ($resetStatus) {

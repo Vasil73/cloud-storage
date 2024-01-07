@@ -2,55 +2,85 @@
 
 namespace Controllers;
 
+    use Core\Handler;
+    use Core\JsonRequest;
+    use Core\Response;
     use Exception;
     use Models\FoldersFileModel;
 
     class FoldersFileController
     {
         private FoldersFileModel $model;
+        private JsonRequest $jsonRequest;
 
-        public function __construct($table_name)
+        public function __construct()
         {
-            $this->model = new FoldersFileModel($table_name);
+            $this->model = new FoldersFileModel('folders');
+            $this->jsonRequest = new JsonRequest();
         }
 
-        public function addFolder($data)
+        public function addFolder()
         {
             try {
+                $data = $this->jsonRequest->getData();
+                $folderName = $data['name'];
+
+                if ($this->model->folderExists($folderName)) {
+                    Response::sendJsonResponse(['error' => 'Папка с таким именем уже существует.'], 400);
+                    return;
+                }
                 $response = $this->model->addFolder($data);
-                echo $response;
+                Response::sendJsonResponse($response);
+
             } catch (Exception $e) {
-                echo 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
             }
         }
 
-        public function renameFolder($id, $newName)
+        public function renameFolder()
         {
             try {
-                $response = $this->model->renameFolder($id, $newName);
-                echo $response;
+                $id = $this->jsonRequest->get('id');
+                $newName = $this->jsonRequest->get('newName');
+                if (is_null($id) || is_null($newName)) {
+                    throw new Exception('Необходимы параметры id и newName.');
+                }
+                $response = $this->model->renameFolder((int)$id, $newName);
+                Response::sendJsonResponse($response);
             } catch (Exception $e) {
-                echo 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
             }
         }
 
-        public function getFolder($id)
+        public function getFolder()
         {
             try {
-                $response = $this->model->getFolder($id);
-                echo $response;
+                $id = $this->jsonRequest->get('id');
+                if (is_null($id)) {
+                    throw new Exception('Необходим параметр id.');
+                }
+                $response = $this->model->getFolder((int)$id);
+                Response::sendJsonResponse($response);
             } catch (Exception $e) {
-                echo 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
             }
         }
 
-        public function removeFolder($id)
+        public function removeFolder()
         {
             try {
-                $response = $this->model->removeFolder($id);
-                echo $response;
+                $id = $this->jsonRequest->get('id');
+                if (is_null($id)) {
+                    throw new Exception('Необходим параметр id.');
+                }
+                $response = $this->model->removeFolder((int)$id);
+                Response::sendJsonResponse($response);
+                if ($response) {
+                    Response::sendJsonResponse (['message' => "Папка успешно удалена!"]);
+                }
             } catch (Exception $e) {
-                echo 'Произошла ошибка: ' . $e->getMessage();
+                Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
             }
         }
+
     }

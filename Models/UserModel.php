@@ -4,6 +4,7 @@ namespace Models;
 
     use Core\Database;
     use Core\Response;
+    use Core\TableValidator;
     use Exception;
     use InvalidArgumentException;
     use JsonException;
@@ -13,42 +14,71 @@ namespace Models;
     class UserModel
     {
         protected PDO $pdo;
+        private mixed $table_name;
 
-        public function __construct()
+        public function __construct(string $table_name)
         {
+            $this->table_name = $table_name;
             $this->pdo = Database::getInstance ();
         }
 
-        public function addUser($userData): bool
+        /**
+         * @throws Exception
+         */
+        public function getUsers(): ?array
         {
-            $name = htmlspecialchars($userData['name']);
-            $email = filter_var($userData['email'], FILTER_VALIDATE_EMAIL);
-            $age = filter_var($userData['age'], FILTER_VALIDATE_INT);
-            $gender = in_array($userData['gender'], ['male', 'female']) ? $userData['gender'] : null;
+            $validator = new TableValidator($this->table_name);
+               $validator->check();
 
-            if (!$email || !$age || !$gender) {
+            $stmt = $this->pdo->prepare ( "SELECT * FROM `{$this->table_name}`" );
+            $stmt->execute ();
 
-                return false;
+            $result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+            if (!$result) {
+                return null;
             }
-
-            $query = $this->pdo->prepare('INSERT INTO users (name, email, age, gender)
-            VALUES (:name, :email, :age, :gender)');
-            $query->bindValue(':name', $name, PDO::PARAM_STR);
-            $query->bindValue(':email', $email, PDO::PARAM_STR);
-            $query->bindValue(':age', $age, PDO::PARAM_INT);
-            $query->bindValue(':gender', $gender, PDO::PARAM_STR);
-
-            return $query->execute();
+            return $result;
         }
 
+        /**
+         * @throws Exception
+         */
+        public function getUserById($userId)
+        {
+            $validator = new TableValidator($this->table_name);
+            $validator->check();
+
+            $userId = intval($userId);
+            if ($userId <= 0) {
+                throw new InvalidArgumentException("Invalid user ID.");
+            }
+
+            $stmt = $this->pdo->prepare("SELECT * FROM `{$this->table_name}` WHERE id = :userId");
+            $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$result) {
+                return null;
+            }
+
+            return $result;
+        }
+
+        /**
+         * @throws Exception
+         */
         public function updateUser($id, $data): bool
         {
+            $validator = new TableValidator($this->table_name);
+            $validator->check();
+
                 $name = htmlspecialchars($data['name']);
                 $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
                 $age = filter_var($data['age'], FILTER_VALIDATE_INT);
                 $gender = in_array($data['gender'], ['male', 'female']) ? $data['gender'] : null;
 
-                $query = $this->pdo->prepare("UPDATE users SET name = :name, email = :email, age = :age, 
+                $query = $this->pdo->prepare("UPDATE `{$this->table_name}` SET name = :name, email = :email, age = :age, 
                      gender = :gender WHERE id = :id");
                 $query->bindParam(":id", $id, PDO::PARAM_INT);
                 $query->bindParam(":name", $name, PDO::PARAM_STR);
@@ -60,49 +90,21 @@ namespace Models;
                 return true;
         }
 
-        public function getUsers(): array
-        {
-            $stmt = $this->pdo->prepare ( "SELECT * FROM users" );
-            $stmt->execute ();
-
-            return $stmt->fetchAll ( PDO::FETCH_ASSOC );
-        }
-
         /**
-         * @throws JsonException
+         * @throws Exception
          */
-        public function getUserById($userId)
-        {
-            $userId = intval ($userId);
-
-            if ($userId <= 0) {
-                return json_encode(["status" => "error", "message" => "Invalid user ID."]);
-            }
-
-            $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = :userId");
-            $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Проверка на то, что результат не является FALSE
-            if (!$result) {
-                return json_encode(["status" => "error", "message" => "User not found."]);
-            }
-            else {
-                return json_encode($result, JSON_THROW_ON_ERROR);
-            }
-        }
-
         public function searchByEmail($email)
         {
+            $validator = new TableValidator($this->table_name);
+            $validator->check();
+
             $email = filter_var($email, FILTER_VALIDATE_EMAIL);
             if($email === false) {
                 throw new InvalidArgumentException('Неверный адрес электронной почты');
             }
 
             try {
-                $stmt = $this->pdo->prepare ( "SELECT * FROM users WHERE email= :email" );
+                $stmt = $this->pdo->prepare ( "SELECT * FROM " . $this->table_name . " WHERE email= :email" );
                 $stmt->bindValue  ( ':email', $email );
                 $stmt->execute ();
 
@@ -114,17 +116,23 @@ namespace Models;
             }
         }
 
+        /**
+         * @throws Exception
+         */
         public function deleteUserById($id): bool
         {
+            $validator = new TableValidator($this->table_name);
+            $validator->check();
+
             $id = intval ($id);
             if ($id <= 0) {
                 return false;
             }
 
-            $query = $this->pdo->prepare('DELETE FROM users WHERE id = :id');
-            $query->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt = $this->pdo->prepare('DELETE FROM " . $this->table_name . " WHERE id = :id');
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
-            return $query->execute();
+            return $stmt->execute();
         }
 
     }

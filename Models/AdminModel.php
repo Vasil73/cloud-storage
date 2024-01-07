@@ -2,16 +2,24 @@
 
 namespace Models;
 
-    use Core\Response;
+    use Core\TableValidator;
     use Exception;
     use PDO;
 
     class AdminModel extends UserModel
     {
 
+       public string $table_name;
+
+        /**
+         * @throws Exception
+         */
         private function isUserAdmin($userId): bool
         {
-            $stmt = $this->pdo->prepare("SELECT * FROM users WHERE role = 'admin' AND id = :userId");
+            $validator = new TableValidator($this->table_name);
+            $validator->check();
+
+            $stmt = $this->pdo->prepare("SELECT * FROM `{ $this->table_name }` WHERE role = 'admin' AND id = :userId");
             $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -58,7 +66,7 @@ namespace Models;
         {
             foreach ($data as $key => &$value) {
                 if (is_string($value)) {
-                    $value = strtolower(trim(htmlspecialchars($value, ENT_QUOTES)));
+                    $value[$key] = strtolower(trim(htmlspecialchars($value, ENT_QUOTES)));
                 }
             }
             return $data;

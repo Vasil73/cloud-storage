@@ -2,17 +2,18 @@
 
 namespace Controllers;
 
+    use Core\App;
     use Models\AdminModel;
     use Core\Response;
     use Exception;
 
     class AdminController
     {
-        private $adminModel;
+        private AdminModel $adminModel;
 
-        public function __construct()
+        public function __construct(string $table_name)
         {
-            $this->adminModel = new AdminModel();
+            $this->adminModel = new AdminModel($table_name);
         }
 
         public function getUserList($adminId)
@@ -30,9 +31,9 @@ namespace Controllers;
             try {
                 $result = $this->adminModel->deleteUser($adminId, $userId);
                 if ($result) {
-                    Response::sendJsonResponse(['message' => 'User deleted successfully.'], 200);
+                    Response::sendJsonResponse(['message' => 'Пользователь успешно удален.'], 200);
                 } else {
-                    Response::sendJsonResponse(['error' => 'Failed to delete user.'], 400);
+                    Response::sendJsonResponse(['error' => 'Не удалось удалить пользователя.'], 400);
                 }
             } catch (Exception $e) {
                 Response::sendJsonResponse(['error' => $e->getMessage()], $e->getCode());
@@ -44,9 +45,9 @@ namespace Controllers;
             try {
                 $result = $this->adminModel->updateUser($userId, $data);
                 if ($result) {
-                    Response::sendJsonResponse(['message' => 'User updated successfully.'], 200);
+                    Response::sendJsonResponse(['message' => 'Пользователь обновлен успешно.'], 200);
                 } else {
-                    Response::sendJsonResponse(['error' => 'Failed to update user.'], 400);
+                    Response::sendJsonResponse(['error' => 'Не удалось обновить пользователя.'], 400);
                 }
             } catch (Exception $e) {
                 Response::sendJsonResponse(['error' => $e->getMessage()], $e->getCode());

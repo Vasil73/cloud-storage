@@ -8,20 +8,21 @@ namespace Core;
     class TableValidator
     {
         private string $table_name;
+        private array $allowedTables;
 
         public function __construct(string $table_name)
         {
             $this->table_name = $table_name;
+            $this->allowedTables = include 'configs/allowed_tables.php';
         }
 
         /**
          * @throws Exception
          */
-        private function validateTableName(): void
+        private function validateTableName()
         {
-            $allowedTables = ['files', 'folders', 'file_user', 'users','sessions'];
 
-            if (!in_array($this->table_name, $allowedTables)) {
+            if (!in_array($this->table_name, $this->allowedTables)) {
                 throw new Exception("Invalid table name: {$this->table_name}");
             }
         }
@@ -29,7 +30,7 @@ namespace Core;
         /**
          * @throws Exception
          */
-        public function check(): void
+        public function check()
         {
             $this->validateTableName();
         }

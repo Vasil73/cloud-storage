@@ -8,7 +8,7 @@ namespace Core;
 
     class App
     {
-        private static $services = [];
+        private static array $services = [];
 
         public static function addService($name, $service)
         {
