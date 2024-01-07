@@ -13,7 +13,7 @@ namespace Core;
         public function __construct(string $table_name)
         {
             $this->table_name = $table_name;
-            $this->allowedTables = include 'configs/allowed_tables.php';
+            $this->allowedTables = include 'common/allowed_tables.php';
         }
 
         /**
