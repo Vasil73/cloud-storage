@@ -2,20 +2,18 @@
 
 namespace Models;
 
-    use Core\Database;
-    use Core\TableValidator;
-    use Exception;
-    use PDO;
+use Exception;
+use PDO;
 
-    class FileAccessModel
+    class FileAccessModel extends BaseModel
     {
-        public PDO $pdo;
-        private string $table_name;
-
-        public function __construct($table_name)
+        /**
+         * @param string $table_name
+         * @throws Exception
+         */
+        public function __construct(string $table_name)
         {
-            $this->table_name = $table_name;
-            $this->pdo = Database::getInstance ();
+            parent::__construct($table_name);
         }
 
         /**
@@ -23,9 +21,7 @@ namespace Models;
          */
         public function addSharedUser($file_id, $user_id): bool
         {
-            $validator = new TableValidator($this->table_name);
-            $validator->check();
-            $stmt = $this->pdo->prepare ( "INSERT INTO  " . $this->table_name . "
+            $stmt = $this->pdo->prepare ( "INSERT INTO  $this->table_name
                     (file_id, user_id) VALUES (:file_id, :user_id)" );
             $stmt->bindParam ( ':file_id', $file_id, PDO::PARAM_INT );
             $stmt->bindParam ( ':user_id', $user_id, PDO::PARAM_INT );

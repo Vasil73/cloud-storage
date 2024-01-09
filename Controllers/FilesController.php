@@ -2,23 +2,23 @@
 
 namespace Controllers;
 
-    use Models\FileModel;
-    use Core\Response;
-    use Exception;
+use Models\FileModel;
+use Core\Response;
+use Exception;
 
-    class FilesController
+    class FilesController extends BaseController
     {
-        private FileModel $fileModel;
+        private FileModel $model;
 
         public function __construct()
         {
-            $this->fileModel = new FileModel('file');
+            $this->model = new FileModel('files');
+            parent::__construct();
         }
-
         public function listFiles()
         {
             try {
-                $files = $this->fileModel->fileList();
+                $files = $this->model->fileList();
                 Response::sendJsonResponse($files);
             } catch (Exception $e) {
                 Response::sendJsonResponse(["error" => $e->getMessage()], 500);
@@ -28,7 +28,7 @@ namespace Controllers;
         public function getFile($id)
         {
             try {
-                $file = $this->fileModel->getFile($id);
+                $file = $this->model->getFile($id);
                 Response::sendJsonResponse($file);
             } catch (Exception $e) {
                 Response::sendJsonResponse(["error" => $e->getMessage()], 404);
@@ -38,7 +38,7 @@ namespace Controllers;
         public function addFile($data)
         {
             try {
-                $file = $this->fileModel->addFile($data);
+                $file = $this->model->addFile($data);
                 Response::sendJsonResponse($file, 201);
             } catch (Exception $e) {
                 Response::sendJsonResponse(["error" => $e->getMessage()], 400);
@@ -48,7 +48,7 @@ namespace Controllers;
         public function renameFile($id, $newName)
         {
             try {
-                $result = $this->fileModel->renameFile($id, $newName);
+                $result = $this->model->renameFile($id, $newName);
                 Response::sendJsonResponse($result);
             } catch (Exception $e) {
                 Response::sendJsonResponse(["error" => $e->getMessage()], 400);
@@ -58,7 +58,7 @@ namespace Controllers;
         public function removeFile($id)
         {
             try {
-                $result = $this->fileModel->removeFile($id);
+                $result = $this->model->removeFile($id);
                 Response::sendJsonResponse($result);
             } catch (Exception $e) {
                 Response::sendJsonResponse(["error" => $e->getMessage()], 400);

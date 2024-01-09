@@ -2,7 +2,7 @@
 
 namespace Core;
 
-    use Exception;
+use Exception;
 
 
     class TableValidator

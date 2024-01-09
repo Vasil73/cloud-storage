@@ -14,13 +14,13 @@ use Controllers\FileAccessController;
             '/users/list/' => [UserController::class, 'getUsers'],
             '/user/get/{id}/' => [UserController::class, 'getUserId'],
             '/users/logout/{id}/' => [AuthController::class, 'logout'],
-            '/admin/users/list/' => [AdminController::class, 'getUserList'],
-            '/admin/users/get/{id}/' => [AdminController::class, 'getUserById'],
-            '/files/list/' => [FilesController::class, 'fileList'],
+            '/users/admin/list/' => [AdminController::class, 'getUserList'],
+            '/users/admin/get/{id}/' => [AdminController::class, 'getUserById'],
+            '/files/list/' => [FilesController::class, 'listFiles'],
             '/files/get/{id}/' => [FilesController::class, 'getFile'],
-            '/directories/get/{id}/' => [FoldersFileController::class, 'getFolder'],
+            '/files/directories/get/{id}/' => [FoldersFileController::class, 'getFolderId'],
             '/user/search/{email}/' => [UserController::class, 'searchByEmail'],
-            '/get/shared/user/' => [FileAccessController::class, 'getSharedUsers']
+            '/user/get/shared/' => [FileAccessController::class, 'getSharedUsers']
         ],
         'POST' => [
 
@@ -28,21 +28,21 @@ use Controllers\FileAccessController;
             '/users/login/' => [AuthController::class, 'handleLoginRequest'],
             '/users/reset_password/' => [AuthController::class, 'resetPassword'],
             '/files/add/' => [FilesController::class, 'addFile'],
-            '/directories/add/' => [FoldersFileController::class, 'addFolder'],
+            '/files/directories/add/' => [FoldersFileController::class, 'addFolder'],
             '/users/register/' => [AuthController::class, 'register'],
         ],
         'PUT' => [
             '/user/update/{id}/' => [UserController::class, 'updateUser'],
-            '/admin/users/update/{id}/' => [AdminController::class, 'updateUser'],
-            '/files/rename/{id:\d+}/' => [FilesController::class, 'renameFile'],
-            '/directories/rename/{id:\d+}/' => [FoldersFileController::class, 'renameFolder'],
-            '/files/share/{id:\d+}/{user_id:\d+}/' => [FileAccessController::class, 'addSharedUsers']
+            '/user/admin/update/{id}/' => [AdminController::class, 'updateUserAdmin'],
+            '/files/rename/{id}/' => [FilesController::class, 'renameFile'],
+            '/files/directories/rename/{id}/' => [FoldersFileController::class, 'renameFolder'],
+            '/files/share/{id}/{user_id}/' => [FileAccessController::class, 'addSharedUsers']
         ],
         'DELETE' => [
-            '/admin/users/delete/{id:\d+}/' => [AdminController::class, 'deleteUser'],
+            '/users/admin/delete/{id}/' => [AdminController::class, 'deleteUser'],
             '/user/delete/{id}/' => [UserController::class, 'deleteUser'],
-            '/files/remove/{id:\d+}/' => [FilesController::class, 'removeFile'],
-            '/directories/delete/{id:\d+}/' => [FoldersFileController::class, 'removeFolder'],
-            '/files/share/{id:\d+}/{user_id:\d+}/' => [FileAccessController::class, 'removeSharedUser']
+            '/files/remove/{id}/' => [FilesController::class, 'removeFile'],
+            '/files/directories/delete/{id}/' => [FoldersFileController::class, 'removeFolder'],
+            '/files/share_delete/{id}/{user_id}/' => [FileAccessController::class, 'removeSharedUser']
         ]
     ];

@@ -2,12 +2,12 @@
 
 namespace Core;
 
-    use Exception;
+use Exception;
 
     class Router {
-        private $routes;
+        private mixed $routes;
 
-        public function __construct($routes)
+        public function __construct(mixed $routes)
         {
             $this->routes = $routes;
         }
@@ -21,9 +21,9 @@ namespace Core;
                 if ($method === $request->getMethod()) {
                     foreach($routes as $route => $action) {
                         $matchResult = $this->matchRoute($route, $request->getUri());
+                        $controller = new $action[ 0 ]();
                         if ($matchResult['isMatch']) {
-                            $controller = new $action[0]();
-                            $controller->{$action[1]}($matchResult['params']);
+                            $controller->{$action[ 1 ]}(...$matchResult[ 'params' ] );
                         }
                     }
                 }
@@ -42,12 +42,13 @@ namespace Core;
                     if ($this->isParam($routeParts[$i])) {
                         $params[$this->getParamName($routeParts[$i])] = $uriParts[$i];
                     } else if ($routeParts[$i] !== $uriParts[$i]) {
-                        return ['isMatch' => false];
+                        return ['isMatch' => false, 'params' => $params];
                     }
                 }
                 return ['isMatch' => true, 'params' => $params];
             }
-            return ['isMatch' => false];
+           // return ['isMatch' => false];
+            return ['isMatch' => false, 'params' => $params];
         }
 
         private function isParam(string $routePart): bool

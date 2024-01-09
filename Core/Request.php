@@ -2,8 +2,6 @@
 
 namespace Core;
 
-    use Exception;
-
     class Request
     {
         private mixed $method;

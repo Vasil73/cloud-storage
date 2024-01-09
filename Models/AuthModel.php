@@ -2,26 +2,21 @@
 
 namespace Models;
 
+use Core\TableValidator;
+use Exception;
+use InvalidArgumentException;
+use PDO;
+use PDOException;
 
-    use Core\App;
-    use Core\Database;
-    use Core\Response;
-    use Core\TableValidator;
-    use Exception;
-    use InvalidArgumentException;
-    use PDO;
-    use PDOException;
-
-    class AuthModel
+    class AuthModel extends BaseModel
     {
-        private PDO $pdo;
-        private string $table_name;
-
+        /**
+         * @param string $table_name
+         * @throws Exception
+         */
         public function __construct(string $table_name)
         {
-            $this->table_name = $table_name;
-          //  $this->pdo = App::getService ('database_connect');
-              $this->pdo = Database::getInstance ();
+            parent::__construct($table_name);
         }
 
         /**
@@ -29,9 +24,6 @@ namespace Models;
          */
         public function register(string $name, string $email, string $password, string $role)
         {
-            $validator = new TableValidator($this->table_name);
-            $validator->check();
-
             $email = filter_var($email, FILTER_SANITIZE_EMAIL);
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 throw new \InvalidArgumentException("Неверный формат email");
@@ -43,7 +35,7 @@ namespace Models;
                 throw new \InvalidArgumentException(  'Пользователь с таким email уже есть' );
             }
 
-            $stmt = $this->pdo->prepare("INSERT INTO `{ $this->table_name }` (name, email, password, role) VALUES (?, ?, ?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO $this->table_name (name, email, password, role) VALUES (?, ?, ?, ?)");
             $stmt->execute([$name, $email, $password, $role]);
 
             return $stmt->rowCount() > 0;
@@ -57,7 +49,7 @@ namespace Models;
             $validator = new TableValidator($this->table_name);
             $validator->check();
 
-            $stmt = $this->pdo->prepare("SELECT * FROM `{ $this->table_name }` WHERE email = :email");
+            $stmt = $this->pdo->prepare("SELECT * FROM $this->table_name WHERE email = :email");
             $stmt->bindParam(':email', $email);
             $stmt->execute();
 
@@ -69,10 +61,7 @@ namespace Models;
          */
         public function setToken($id, $token): void
         {
-            $validator = new TableValidator($this->table_name);
-            $validator->check();
-
-            $stmt = $this->pdo->prepare ( "UPDATE `{ $this->table_name }` SET token = :token WHERE id = :id" );
+            $stmt = $this->pdo->prepare ( "UPDATE $this->table_name SET token = :token WHERE id = :id" );
             $stmt->bindParam ( ':token', $token );
             $stmt->bindParam ( ':id', $id );
             $stmt->execute ();
@@ -83,10 +72,7 @@ namespace Models;
          */
         public function logout($id): void
         {
-            $validator = new TableValidator($this->table_name);
-            $validator->check();
-
-            $stmt = $this->pdo->prepare ( 'UPDATE `{ $this->table_name }` SET token = NULL WHERE id = :id' );
+            $stmt = $this->pdo->prepare ( "UPDATE $this->table_name SET token = NULL WHERE id = :id" );
             $stmt->execute ( [':id' => $id['id']] ); //
         }
 
@@ -95,15 +81,12 @@ namespace Models;
          */
         public function resetPassword(string $email): bool
         {
-            $validator = new TableValidator($this->table_name);
-            $validator->check();
-
             try {
                 if (!filter_var ( $email, FILTER_VALIDATE_EMAIL )) {
                     throw new InvalidArgumentException( 'Неверный формат электронной почты' );
                 }
 
-                $query = "SELECT * FROM `{ $this->table_name }` WHERE email = :email";
+                $query = "SELECT * FROM $this->table_name WHERE email = :email";
                 $stmt = $this->pdo->prepare ( $query );
                 $stmt->bindParam ( ':email', $email, PDO::PARAM_STR );
                 $stmt->execute ();
@@ -113,7 +96,7 @@ namespace Models;
 
                 $resetToken = bin2hex ( random_bytes ( 32 ) );
 
-                $query = "UPDATE `{ $this->table_name }` SET reset_token = :resetToken, reset_token_expires = NOW() + INTERVAL 1
+                $query = "UPDATE $this->table_name SET reset_token = :resetToken, reset_token_expires = NOW() + INTERVAL 1
                          HOUR WHERE email = :email";
                 $stmt = $this->pdo->prepare ( $query );
                 $stmt->bindParam ( ':resetToken', $resetToken, PDO::PARAM_STR );
@@ -142,7 +125,7 @@ namespace Models;
          */
         public function userExists($email): bool
         {
-            $stmt = $this->pdo->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt = $this->pdo->prepare("SELECT id FROM $this->table_name WHERE email = :email");
             $stmt->bindParam(':email', $email);
             $stmt->execute();
 
