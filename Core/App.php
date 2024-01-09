@@ -2,9 +2,9 @@
 
 namespace Core;
 
-    use InvalidArgumentException;
-    use LogicException;
-    use OutOfBoundsException;
+use InvalidArgumentException;
+use LogicException;
+use OutOfBoundsException;
 
     class App
     {

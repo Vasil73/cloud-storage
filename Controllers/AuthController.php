@@ -4,24 +4,20 @@ declare(strict_types=1);
 
 namespace Controllers;
 
-    use Core\JsonRequest;
-    use Core\Response;
-    use Core\SessionManager;
-    use Core\TableValidator;
-    use Exception;
-    use Models\AuthModel;
-    use PDOException;
+use Core\JsonRequest;
+use Core\Response;
+use Exception;
+use Models\AuthModel;
+use PDOException;
 
-    class AuthController
+    class AuthController extends BaseController
     {
         private AuthModel $authModel;
-        private SessionManager $sessionManager;
 
         public function __construct()
         {
-            $this->authModel = new AuthModel('user');
-            $this->sessionManager = new SessionManager();
-            $this->sessionManager->start();
+            $this->authModel = new AuthModel('users');
+            parent::__construct();
         }
 
         /**
@@ -31,11 +27,6 @@ namespace Controllers;
         {
             $input = new JsonRequest();
             $data = $input->getData ();
-
-            if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-                Response::sendJsonResponse(["error" => 'Неправильный JSON'], 400);
-                return;
-            }
 
             if (isset($data['name'], $data['email'], $data['password'], $data['role'])) {
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
@@ -69,7 +60,7 @@ namespace Controllers;
 
                     setcookie ('token', $token, time () + 3600, '/', '', true, true);
 
-                    return true;
+                    return ['massage' => 'Вы успешно вошли в систему.'];
                 } else {
                     return false;
                 }
@@ -77,10 +68,11 @@ namespace Controllers;
             {
                 error_log($ex->getMessage());
                 Response::sendJsonResponse(["error" => "Внутренняя ошибка сервера"], 500);
+                return false;
             } catch (Exception $e) {
-
+                error_log ($e->getMessage ());
+                return false;
             }
-            return ['massage' => 'Вы успешно вошли в систему.'];
         }
 
          public function logout($id): void

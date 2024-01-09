@@ -2,9 +2,9 @@
 
 namespace Core;
 
-    use Exception;
-    use InvalidArgumentException;
-    use PDO;
+use Exception;
+use InvalidArgumentException;
+use PDO;
 
     class Handler
     {

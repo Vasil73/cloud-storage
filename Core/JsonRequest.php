@@ -2,7 +2,7 @@
 
 namespace Core;
 
-    use JsonException;
+use JsonException;
 
     class JsonRequest
     {
@@ -18,6 +18,10 @@ namespace Core;
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new JsonException("Ошибка разбора JSON: " . json_last_error_msg());
             }
+//            if (!is_array($data)) {
+//                throw new JsonException("JSON должен быть массивом");
+//            }
+//            $this->data = $data;
         }
 
         public function getData(): array
@@ -29,4 +33,5 @@ namespace Core;
         {
             return $this->data[$key] ?? $default;
         }
+
     }

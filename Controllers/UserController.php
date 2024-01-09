@@ -2,19 +2,21 @@
 
 namespace Controllers;
 
-    use Core\JsonRequest;
-    use Core\Response;
-    use InvalidArgumentException;
-    use Models\UserModel;
-    use Exception;
-    use PDOException;
+use Core\JsonRequest;
+use Core\Response;
+use InvalidArgumentException;
+use Models\UserModel;
+use Exception;
+use PDOException;
 
-    class UserController {
-        private UserModel $userModel;
+    class UserController extends BaseController
+    {
+        private UserModel $model;
 
         public function __construct()
         {
-            $this->userModel = new UserModel('user');
+            $this->model = new UserModel('users');
+            parent::__construct();
         }
 
         public function updateUser($params ): void
@@ -25,14 +27,12 @@ namespace Controllers;
             $jsonRequest = new JsonRequest();
             $input = $jsonRequest->getData ();
 
-           // $input = json_decode(file_get_contents('php://input'), true);
-
             if (!isset( $input[ 'name' ], $input[ 'email' ], $input[ 'age' ], $input[ 'gender' ] )) {
                 Response::sendJsonResponse ( ['error' => 'Необходимы параметры: name, email, age, gender'], 400 );
             }
 
             try {
-                $isUpdated = $this->userModel->updateUser ( $params[ 'id' ], $input );
+                $isUpdated = $this->model->updateUser ( $params[ 'id' ], $input );
                 if ($isUpdated) {
                     Response::sendJsonResponse ( ['status' => "Пользователь успешно обновлен"] );
                 } else {
@@ -63,7 +63,7 @@ namespace Controllers;
             try {
                 $user = $this->userModel->getUserById($id);
                 if ($user) {
-                    Response::sendJsonResponse ( true );
+                    Response::sendJsonResponse ( $user );
                 } else {
                     Response::sendJsonResponse (["massage" => "Пользователь не найден"], 404);
                 }
@@ -94,7 +94,7 @@ namespace Controllers;
         public function deleteUser($id): void
         {
             try {
-                $userDelete = $this->userModel->deleteUserById($id);
+                $userDelete = $this->model->deleteUserById($id);
                 if ($userDelete) {
                     Response::sendJsonResponse ( true );
                 } else {

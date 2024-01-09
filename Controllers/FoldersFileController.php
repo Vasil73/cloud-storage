@@ -2,21 +2,18 @@
 
 namespace Controllers;
 
-    use Core\Handler;
-    use Core\JsonRequest;
-    use Core\Response;
-    use Exception;
-    use Models\FoldersFileModel;
+use Core\Response;
+use Exception;
+use Models\FoldersFileModel;
 
-    class FoldersFileController
+    class FoldersFileController extends BaseController
     {
         private FoldersFileModel $model;
-        private JsonRequest $jsonRequest;
 
         public function __construct()
         {
             $this->model = new FoldersFileModel('folders');
-            $this->jsonRequest = new JsonRequest();
+            parent::__construct();
         }
 
         public function addFolder()
@@ -41,9 +38,9 @@ namespace Controllers;
         {
             try {
                 $id = $this->jsonRequest->get('id');
-                $newName = $this->jsonRequest->get('newName');
-                if (is_null($id) || is_null($newName)) {
-                    throw new Exception('Необходимы параметры id и newName.');
+                $newName = $this->jsonRequest->get('name');
+                if (is_null($id) ||is_null($newName)) { //is_null($id) ||
+                    throw new Exception('Необходимы параметры id и name.');
                 }
                 $response = $this->model->renameFolder((int)$id, $newName);
                 Response::sendJsonResponse($response);
@@ -52,18 +49,19 @@ namespace Controllers;
             }
         }
 
-        public function getFolder()
+        public function getFolderId($id)
         {
             try {
-                $id = $this->jsonRequest->get('id');
-                if (is_null($id)) {
-                    throw new Exception('Необходим параметр id.');
-                }
                 $response = $this->model->getFolder((int)$id);
-                Response::sendJsonResponse($response);
+                if ($response !== null) {
+                    Response::sendJsonResponse ($response);
+                } else {
+                   Response::sendJsonResponse (["massage" => "Папка не найдена"], 404);
+                }
             } catch (Exception $e) {
                 Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
             }
+
         }
 
         public function removeFolder()
@@ -74,13 +72,62 @@ namespace Controllers;
                     throw new Exception('Необходим параметр id.');
                 }
                 $response = $this->model->removeFolder((int)$id);
-                Response::sendJsonResponse($response);
                 if ($response) {
                     Response::sendJsonResponse (['message' => "Папка успешно удалена!"]);
                 }
             } catch (Exception $e) {
                 Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
             }
+        }
+        public function moveFile()
+        {
+            try {
+                $data = $this->jsonRequest->getData();
+                $fileId = $data['fileId'] ?? null; // `??` - оператор объединения с null
+                $targetFolderId = $data['targetFolderId'] ?? null;
+
+                if ($fileId === null || $targetFolderId === null) {
+                    throw new Exception('Необходимы параметры fileId и targetFolderId.');
+                }
+
+                $response = $this->model->moveFile((int)$fileId, (int)$targetFolderId);
+                if ($response) {
+                    Response::sendJsonResponse(['message' => 'Файл успешно перемещен.']);
+                } else {
+                    Response::sendJsonResponse(['error' => 'Перемещение файла не удалось.'], 500);
+                }
+
+            } catch (Exception $e) {
+                Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
+            }
+        }
+
+        public function moveFolder()
+        {
+            try {
+                $data = $this->jsonRequest->getData();
+                $folderId = $data['folderId'] ?? null;
+                $targetFolderId = $data['targetFolderId'] ?? null;
+
+                if ($folderId === null || $targetFolderId === null) {
+                    throw new Exception('Необходимы параметры folderId и targetFolderId.');
+                }
+
+                $response = $this->model->moveFolder((int)$folderId, (int)$targetFolderId);
+                if ($response) {
+                    Response::sendJsonResponse(['message' => 'Папка успешно перемещена.']);
+                } else {
+                    Response::sendJsonResponse(['error' => 'Перемещение папки не удалось.'], 500);
+                }
+
+            } catch (Exception $e) {
+                Response::sendJsonResponse(['error' => 'Произошла ошибка: ' . $e->getMessage()], 500);
+            }
+        }
+
+        private function isValidId($id): bool
+        {
+            return is_numeric($id) && (int)$id > 0;
         }
 
     }

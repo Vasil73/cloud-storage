@@ -2,19 +2,19 @@
 
 namespace Controllers;
 
-    use Core\TableValidator;
-    use Exception;
-    use Models\FileAccessModel;
-    use Core\Response;
-    use PDOException;
+use Exception;
+use Models\FileAccessModel;
+use Core\Response;
+use PDOException;
 
-    class FileAccessController
+    class FileAccessController extends BaseController
     {
         private FileAccessModel $model;
 
         public function __construct()
         {
             $this->model = new FileAccessModel('file_user');
+            parent::__construct();
         }
 
         public function addSharedUsers($file_id, $user_id)
