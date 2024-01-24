@@ -1,13 +1,13 @@
 <?php
 
-    use Controllers\AdminController;
+use Controllers\AdminController;
 use Controllers\AuthController;
 use Controllers\FileAccessController;
-    use Controllers\FilesController;
-    use Controllers\FoldersFileController;
-    use Controllers\UserController;
+use Controllers\FilesController;
+use Controllers\FoldersFileController;
+use Controllers\UserController;
 
-    include_once ('index.php');
+include_once ('index.php');
 
     $urlList = [
         'GET' => [
