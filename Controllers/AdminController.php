@@ -68,7 +68,7 @@ use PDOException;
          * @param array $data Массив данных для обновления пользователя.
          *
          * @return void
-         * @throws PDOException Если произошла ошибка БД.
+         * @throws PDOException|Exception Если произошла ошибка БД.
          */
         public function updateUserAdmin(array $data): void
         {
